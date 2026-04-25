@@ -3,6 +3,7 @@ import argparse
 from parse.schedule import download_schedule, parse_schedule, SCHEDULE_LOCAL_DIR
 from parse.results  import download_results, parse_results, RESULTS_LOCAL_DIR
 from parse.combine  import combine, SCHEDULE_TABLES_DIR, RESULTS_TABLES_DIR
+from parse.leagues  import leagues, COMBINED_CSV
 
 
 def main() -> None:
@@ -28,6 +29,7 @@ def main() -> None:
             SCHEDULE_TABLES_DIR / "schedule.csv",
             RESULTS_TABLES_DIR  / "results.csv",
         )
+        leagues(COMBINED_CSV)
 
 
 if __name__ == "__main__":
