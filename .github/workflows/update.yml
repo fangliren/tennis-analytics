@@ -2,7 +2,7 @@ name: Update tennis data
 
 on:
   schedule:
-    - cron: '0 8 * * 1'  # Every Monday 08:00 UTC
+    - cron: '0 5 * * 4'  # Every Thursday 05:00 UTC
   workflow_dispatch:       # Also triggerable manually from GitHub UI
 
 permissions:

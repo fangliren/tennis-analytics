@@ -19,10 +19,10 @@ pip install -e ".[dev]"
 ## Run
 
 ```bash
-python parse/schedule.py
-python parse/results.py
-python parse/combine.py
+python scripts/update.py
 ```
+
+This downloads the latest results and regenerates the combined table. Pass `--refresh-schedule` to also re-download the fixture list (needed once per season). The repo also includes a GitHub Actions workflow (`.github/workflows/update.yml`) that runs this automatically every Thursday at 05:00 UTC.
 
 ## Test
 

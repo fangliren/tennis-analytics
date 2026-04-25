@@ -46,6 +46,7 @@ def combine(schedule_csv: pathlib.Path, results_csv: pathlib.Path) -> None:
 
 
 if __name__ == "__main__":
-    schedule_csv = sorted(SCHEDULE_TABLES_DIR.glob("*.csv"))[-1]
-    results_csv  = sorted(RESULTS_TABLES_DIR.glob("*.csv"))[-1]
-    combine(schedule_csv, results_csv)
+    combine(
+        SCHEDULE_TABLES_DIR / "schedule.csv",
+        RESULTS_TABLES_DIR  / "results.csv",
+    )
