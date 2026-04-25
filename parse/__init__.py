@@ -21,14 +21,34 @@ TEAM_ABBREVIATIONS = {
     "ODYSSEY":       "ODYS",
     "ORCHARD":       "ORCH",
     "PIRTON":        "PIRT",
-    "ST MARG":       "ST M",
-    "ST PAULS":      "ST PS",
-    "TEWIN":         "TEWI",
-    "WATTON":        "WATT",
-    "WELWYN":        "WELW",
-    "WESTON":        "WEST",
-    "WHEATHAMPSTEAD": "WHEA",
-    "WHEATHAM":      "WHEA",
-    "WYMONDLEY":     "WYMOY",
-    "ST MARGS":      "ST M",
+    "ST MARGS":       "ST M",   # alias used in results data — comes first
+    "ST PAULS":       "ST PS",
+    "TEWIN":          "TEWI",
+    "WATTON":         "WATT",
+    "WELWYN":         "WELW",
+    "WESTON":         "WEST",
+    "WHEATHAM":       "WHEA",   # alias used in results data — comes first
+    "WHEATHAMPSTEAD": "WHEA",   # canonical — comes last, wins reverse dict
+    "WYMONDLEY":      "WYMOY",
+    "ST MARG":        "ST M",   # canonical — comes last, wins reverse dict
 }
+
+# Reverse mapping: abbreviation prefix → canonical full club name.
+# Aliases above are listed before their canonical counterpart so the
+# canonical name wins when the dict is inverted (last write wins).
+ABBREVIATION_TO_TEAM = {abbrev: name for name, abbrev in TEAM_ABBREVIATIONS.items()}
+
+
+def expand(code: str) -> str:
+    """Convert an abbreviated team code to its full club name.
+
+    "ELLI1" → "ELLISWICK 1",  "ST M1" → "ST MARG 1",  "ST PS" → "ST PAULS"
+    """
+    if code in ABBREVIATION_TO_TEAM:
+        return ABBREVIATION_TO_TEAM[code]
+    i = len(code)
+    while i > 0 and code[i - 1].isdigit():
+        i -= 1
+    prefix = code[:i].rstrip()
+    number = code[i:]
+    return ABBREVIATION_TO_TEAM[prefix] + " " + number

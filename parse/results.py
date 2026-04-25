@@ -6,7 +6,7 @@ import xlrd
 from datetime import datetime
 from typing import Any
 from parse import PROJECT_ROOT
-from parse import TEAM_ABBREVIATIONS
+from parse import TEAM_ABBREVIATIONS, expand
 
 
 
@@ -67,8 +67,8 @@ def parse_results(xls_path: pathlib.Path) -> None:
 
         record: dict[str, Any] = {RENAME.get(col, col): raw[col_index[col]] for col in COLUMNS_NEEDED if col != "HomeAway"}
 
-        record["home_team"]    = _abbreviate(record["home_team"])
-        record["away_team"]    = _abbreviate(record["away_team"])
+        record["home_team"]    = expand(_abbreviate(record["home_team"]))
+        record["away_team"]    = expand(_abbreviate(record["away_team"]))
         record["fixture_date"] = xlrd.xldate_as_datetime(record["fixture_date"], wb.datemode).date()
         record["division"]     = record["division"].lstrip("0") or "0"
 

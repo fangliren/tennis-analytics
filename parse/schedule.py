@@ -5,7 +5,7 @@ import pathlib
 import requests
 import openpyxl
 from datetime import datetime
-from parse import PROJECT_ROOT
+from parse import PROJECT_ROOT, expand
 
 
 
@@ -63,8 +63,8 @@ def parse_schedule(xlsx_path: pathlib.Path) -> None:
                     fixtures.append({
                         "fixture_date": fixture_date,
                         "division": div_name,
-                        "home_team": home,
-                        "away_team": away,
+                        "home_team": expand(str(home)),
+                        "away_team": expand(str(away)),
                     })
 
     TABLES_DIR.mkdir(parents=True, exist_ok=True)
