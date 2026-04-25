@@ -1,7 +1,6 @@
 
 import csv
 import pathlib
-from datetime import datetime
 from config import PROJECT_ROOT
 
 
@@ -34,8 +33,7 @@ def combine(schedule_csv: pathlib.Path, results_csv: pathlib.Path) -> None:
         })
 
     COMBINED_TABLES_DIR.mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    out_path = COMBINED_TABLES_DIR / f"combined_{timestamp}.csv"
+    out_path = COMBINED_TABLES_DIR / "combined.csv"
 
     fieldnames = list(schedule_rows[0].keys()) + RESULT_FIELDS
     with open(out_path, "w", newline="") as f:

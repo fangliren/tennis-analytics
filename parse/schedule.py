@@ -68,8 +68,7 @@ def parse_schedule(xlsx_path: pathlib.Path) -> None:
                     })
 
     TABLES_DIR.mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    out_path = TABLES_DIR / f"schedule_{timestamp}.csv"
+    out_path = TABLES_DIR / "schedule.csv"
 
     with open(out_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["fixture_date", "division", "home_team", "away_team"])

@@ -90,8 +90,7 @@ def parse_results(xls_path: pathlib.Path) -> None:
         rows.append(record)
 
     TABLES_DIR.mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    out_path = TABLES_DIR / f"results_{timestamp}.csv"
+    out_path = TABLES_DIR / "results.csv"
 
     fieldnames = ["fixture_date", "division", "home_team", "away_team", "home_sets", "home_games", "away_sets", "away_games"]
     with open(out_path, "w", newline="") as f:
