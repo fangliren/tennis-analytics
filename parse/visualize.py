@@ -108,8 +108,26 @@ h1 { text-align: center; font-size: 2rem; color: #86efac;
             letter-spacing: 0; text-transform: none; }
 .team-list { padding: 6px 0 10px; }
 .t-row { display: flex; align-items: center; gap: 8px; padding: 4px 14px;
-         border-radius: 6px; }
+         border-left: 3px solid transparent; }
 .t-row:hover { background: rgba(255,255,255,0.03); }
+.t-row.champion   { border-left-color:#fbbf24; background:rgba(251,191,36,.07); }
+.t-row.promotion  { border-left-color:#60a5fa; background:rgba(96,165,250,.07); }
+
+.t-row.relegation { border-left-color:#f87171; background:rgba(248,113,113,.07); }
+.zone-break { border-top:1px dashed rgba(255,255,255,0.07); margin-top:2px; padding-top:5px; }
+.ztag { font-size:.6rem; font-weight:700; padding:1px 6px; border-radius:10px;
+        flex-shrink:0; white-space:nowrap; }
+.ztag.champion   { background:rgba(251,191,36,.22); color:#fbbf24; }
+.ztag.promotion  { background:rgba(96,165,250,.22);  color:#60a5fa; }
+
+.ztag.relegation { background:rgba(248,113,113,.22);  color:#f87171; }
+.legend { display:flex; justify-content:center; gap:18px; flex-wrap:wrap;
+          margin-bottom:32px; font-size:.72rem; }
+.l-item { display:flex; align-items:center; gap:5px; color:#64748b; }
+.l-dot  { width:10px; height:10px; border-radius:50%; }
+.l-dot.champion   { background:#fbbf24; }
+.l-dot.promotion  { background:#60a5fa; }
+.l-dot.relegation { background:#f87171; }
 .t-rank { width: 26px; text-align: right; font-size: .78rem;
           flex-shrink: 0; color: #64748b; }
 .t-btn { background: rgba(96,165,250,0.1); border: 1px solid rgba(96,165,250,0.22);
@@ -156,6 +174,11 @@ h1 { text-align: center; font-size: 2rem; color: #86efac;
 <body>
 <h1>🎾 Datchworth Tennis Leagues</h1>
 <p class="subtitle">Updated __DATE__</p>
+<div class="legend">
+  <span class="l-item"><span class="l-dot champion"></span>Champion</span>
+  <span class="l-item"><span class="l-dot promotion"></span>Promotion zone</span>
+  <span class="l-item"><span class="l-dot relegation"></span>Relegation zone</span>
+</div>
 <div class="grid">
 __CARDS__
 </div>
@@ -198,15 +221,54 @@ def _bar_colors(n: int, division: str, max_group: int) -> list[str]:
     return result
 
 
-def _medal(i: int) -> str:
-    return ["🥇", "🥈", "🥉"][i] if i < 3 else f"{i + 1}."
+_ZONE_TAG = {
+    "champion":   ("", "champion"),
+    "promotion":  ("", "promotion"),
+    "chasing":    ("", "safe"),
+    "relegation": ("", "relegation"),
+    "safe":       ("", "safe"),
+}
 
 
-def _make_card(division: str, rows: list[dict], max_group: int) -> str:
+def _position_zones(division: str, n: int, max_group: int) -> list[str]:
+    """Return a zone label for each position 0..n-1."""
+    zones = ["safe"] * n
+    group = _div_group(division)
+
+    if division == "1":
+        if n > 0: zones[0] = "champion"
+        for i in range(max(1, n - 2), n): zones[i] = "relegation"
+    elif division == "2":
+        for i in range(min(2, n)): zones[i] = "promotion"
+        for i in range(max(2, n - 3), n): zones[i] = "relegation"
+    elif division in ("3A", "3B"):
+        if n > 0: zones[0] = "promotion"
+        if n > 1: zones[1] = "chasing"  # overridden dynamically in visualize()
+        for i in range(max(2, n - 2), n): zones[i] = "relegation"
+    elif group == max_group:
+        for i in range(min(2, n)): zones[i] = "promotion"  # no relegation
+    else:
+        for i in range(min(2, n)): zones[i] = "promotion"
+        for i in range(max(2, n - 2), n): zones[i] = "relegation"
+
+    return zones
+
+
+def _rank(i: int) -> str:
+    return f"{i + 1}."
+
+
+def _make_card(division: str, rows: list[dict], max_group: int,
+               zone_overrides=None) -> str:
     sets_vals    = [int(r["sets_won"]) for r in rows]
     max_sets     = max(sets_vals) if any(s > 0 for s in sets_vals) else 1
     colors       = _bar_colors(len(rows), division, max_group)
     header_color = _header_color(division, max_group)
+    zones        = _position_zones(division, len(rows), max_group)
+    if zone_overrides:
+        for pos, z in zone_overrides.items():
+            if pos < len(zones):
+                zones[pos] = z
 
     rows_html = []
     for i, row in enumerate(rows):
@@ -217,15 +279,19 @@ def _make_card(division: str, rows: list[dict], max_group: int) -> str:
         pct    = round(sets / max_sets * 100)
         tip    = f"Played: {played} &middot; Sets: {sets} &middot; Games: {games}"
         stat   = f'{sets}<small>&middot;{games}g</small>' if played else '<span style="color:#334155">—</span>'
+        tag_html, zone_cls = _ZONE_TAG[zones[i]]
+        separator = " zone-break" if i > 0 and zones[i] != zones[i - 1] else ""
 
         rows_html.append(
-            f'<div class="t-row" onmouseenter="tipShow(this,event)" onmouseleave="tipHide(this)"'
+            f'<div class="t-row {zone_cls}{separator}"'
+            f' onmouseenter="tipShow(this,event)" onmouseleave="tipHide(this)"'
             f' data-tip="{tip}">'
-            f'<span class="t-rank">{_medal(i)}</span>'
+            f'<span class="t-rank">{_rank(i)}</span>'
             f"<button class=\"t-btn\" onclick='showTeam({json.dumps(team)})'>{team}</button>"
             f'<div class="t-bar-outer"><div class="t-bar"'
             f' style="width:{pct}%;background:{colors[i]}"></div></div>'
             f'<span class="t-num">{stat}</span>'
+            f'{tag_html}'
             f'</div>'
         )
 
@@ -262,8 +328,26 @@ def visualize(leagues_csv: pathlib.Path, combined_csv: pathlib.Path = COMBINED_C
             })
 
     max_group = max(_div_group(d) for d in divisions)
+
+    # Determine which 3A/3B second-place team is currently leading the promotion race.
+    zone_overrides: dict[str, dict[int, str]] = {}
+    rows3a = divisions.get("3A", [])
+    rows3b = divisions.get("3B", [])
+    if len(rows3a) > 1 and len(rows3b) > 1:
+        key3a = (int(rows3a[1]["sets_won"]), int(rows3a[1]["games_won"]))
+        key3b = (int(rows3b[1]["sets_won"]), int(rows3b[1]["games_won"]))
+        if key3a == key3b:
+            zone_overrides["3A"] = {1: "promotion"}
+            zone_overrides["3B"] = {1: "promotion"}
+        elif key3a > key3b:
+            zone_overrides["3A"] = {1: "promotion"}
+            zone_overrides["3B"] = {1: "chasing"}
+        else:
+            zone_overrides["3A"] = {1: "chasing"}
+            zone_overrides["3B"] = {1: "promotion"}
+
     cards = [
-        _make_card(div, divisions[div], max_group)
+        _make_card(div, divisions[div], max_group, zone_overrides.get(div))
         for div in sorted(divisions)
     ]
 
