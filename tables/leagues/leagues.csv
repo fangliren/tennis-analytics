@@ -5,6 +5,8 @@ division,team,played,sets_won,games_won
 1,CODI1,1,1,19
 1,WELW2,1,1,14
 1,KNEB1,1,0,10
+1,HITC1,0,0,0
+1,PIRT1,0,0,0
 2,GOSLG,1,3,22
 2,CODI2,1,2,21
 2,LETC1,1,2,19
@@ -43,6 +45,8 @@ division,team,played,sets_won,games_won
 4B,ODYS3,1,1,18
 4B,ELLI3,1,1,15
 4B,ASHW1,1,1,14
+4B,KIMP3,0,0,0
+4B,DIGS3,0,0,0
 5A,DELL2,1,3,27
 5A,PIRT3,1,2,25
 5A,WATT4,1,2,24

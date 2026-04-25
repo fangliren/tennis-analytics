@@ -16,11 +16,15 @@ def leagues(combined_csv: pathlib.Path) -> None:
 
     with open(combined_csv) as f:
         for row in csv.DictReader(f):
-            if row["home_sets"] == "":
-                continue
-
             home_key = (row["division"], row["home_team"])
             away_key = (row["division"], row["away_team"])
+
+            # ensure every team appears even if they haven't played yet
+            totals[home_key]
+            totals[away_key]
+
+            if row["home_sets"] == "":
+                continue
 
             totals[home_key]["played"]    += 1
             totals[home_key]["sets_won"]  += int(row["home_sets"])
