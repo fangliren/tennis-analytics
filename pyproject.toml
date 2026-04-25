@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tennis-analytics"
+version = "0.1.0"
+description = "Tennis analytics tools and scripts."
+authors = [
+    { name = "Finnian Firth", email = "finnianfirth@gmail.com" }
+]
+dependencies = [
+    "requests",
+    "openpyxl",
+    "xlrd",
+]
+requires-python = ">=3.9"
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["."]
