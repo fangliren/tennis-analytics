@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Datchworth Tennis Leagues</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+  min-height: 100vh;
+  padding: 44px 20px 60px;
+}
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  color: #86efac;
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
+}
+.subtitle {
+  text-align: center;
+  color: #475569;
+  font-size: .82rem;
+  margin-bottom: 44px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 22px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+.card {
+  background: #1e293b;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #334155;
+  box-shadow: 0 4px 24px rgba(0,0,0,.35);
+  transition: box-shadow .2s;
+}
+.card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.5); }
+.card-header {
+  padding: 11px 18px;
+  font-weight: 700;
+  font-size: .8rem;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.92);
+}
+.chart-wrap { padding: 12px 16px 16px; }
+</style>
+</head>
+<body>
+<h1>🎾 Datchworth Tennis Leagues</h1>
+<p class="subtitle">Updated 2026-04-25</p>
+<div class="grid">
+  <div class="card">
+    <div class="card-header" style="background:#0369a1">Division 1</div>
+    <div class="chart-wrap" style="height:348px"><canvas id="c0"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header" style="background:#15803d">Division 2</div>
+    <div class="chart-wrap" style="height:348px"><canvas id="c1"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header" style="background:#9333ea">Division 3A</div>
+    <div class="chart-wrap" style="height:348px"><canvas id="c2"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header" style="background:#b45309">Division 3B</div>
+    <div class="chart-wrap" style="height:348px"><canvas id="c3"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header" style="background:#be123c">Division 4A</div>
+    <div class="chart-wrap" style="height:348px"><canvas id="c4"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header" style="background:#0f766e">Division 4B</div>
+    <div class="chart-wrap" style="height:348px"><canvas id="c5"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header" style="background:#c2410c">Division 5A</div>
+    <div class="chart-wrap" style="height:348px"><canvas id="c6"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header" style="background:#4338ca">Division 5B</div>
+    <div class="chart-wrap" style="height:348px"><canvas id="c7"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header" style="background:#0e7490">Division 6A</div>
+    <div class="chart-wrap" style="height:348px"><canvas id="c8"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header" style="background:#65a30d">Division 6B</div>
+    <div class="chart-wrap" style="height:348px"><canvas id="c9"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header" style="background:#7c3aed">Division 7A</div>
+    <div class="chart-wrap" style="height:348px"><canvas id="c10"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header" style="background:#b91c1c">Division 7B</div>
+    <div class="chart-wrap" style="height:348px"><canvas id="c11"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header" style="background:#0d9488">Division 8A</div>
+    <div class="chart-wrap" style="height:348px"><canvas id="c12"></canvas></div>
+  </div>
+</div>
+<script>
+
+  new Chart(document.getElementById("c0"), {
+    type: 'bar',
+    data: {
+      labels: ["\ud83e\udd47 ORCH1", "\ud83e\udd48 WELW1", "\ud83e\udd49 ELLI1", "4.  CODI1", "5.  WELW2", "6.  KNEB1", "7.  HITC1", "8.  PIRT1"],
+      datasets: [{
+        data: [3, 2, 2, 1, 1, 0, 0, 0],
+        backgroundColor: ["rgba(74,222,128,0.92)", "rgba(66,204,117,0.86)", "rgba(59,187,106,0.8)", "rgba(51,170,95,0.74)", "rgba(44,152,84,0.68)", "rgba(36,135,73,0.62)", "rgba(29,118,62,0.56)", "rgba(22,101,52,0.5)"],
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var i = ctx.dataIndex;
+              return '  Sets: ' + ctx.raw + '   Games: ' + [29, 25, 20, 19, 14, 10, 0, 0][i] + '   Played: ' + [1, 1, 1, 1, 1, 1, 0, 0][i];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#64748b', stepSize: 1, precision: 0 },
+          title: { display: true, text: 'Sets Won', color: '#475569', font: { size: 11 } }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#cbd5e1', font: { size: 12 } }
+        }
+      },
+      maintainAspectRatio: false,
+      animation: { duration: 500 }
+    }
+  });
+  new Chart(document.getElementById("c1"), {
+    type: 'bar',
+    data: {
+      labels: ["\ud83e\udd47 GOSLG", "\ud83e\udd48 CODI2", "\ud83e\udd49 LETC1", "4.  WELW3", "5.  ASTO1", "6.  WHEA1", "7.  ELLI2", "8.  KIMP1"],
+      datasets: [{
+        data: [3, 2, 2, 2, 1, 1, 1, 0],
+        backgroundColor: ["rgba(74,222,128,0.92)", "rgba(66,204,117,0.86)", "rgba(59,187,106,0.8)", "rgba(51,170,95,0.74)", "rgba(44,152,84,0.68)", "rgba(36,135,73,0.62)", "rgba(29,118,62,0.56)", "rgba(22,101,52,0.5)"],
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var i = ctx.dataIndex;
+              return '  Sets: ' + ctx.raw + '   Games: ' + [22, 21, 19, 19, 20, 20, 18, 17][i] + '   Played: ' + [1, 1, 1, 1, 1, 1, 1, 1][i];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#64748b', stepSize: 1, precision: 0 },
+          title: { display: true, text: 'Sets Won', color: '#475569', font: { size: 11 } }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#cbd5e1', font: { size: 12 } }
+        }
+      },
+      maintainAspectRatio: false,
+      animation: { duration: 500 }
+    }
+  });
+  new Chart(document.getElementById("c2"), {
+    type: 'bar',
+    data: {
+      labels: ["\ud83e\udd47 LIST1", "\ud83e\udd48 ODYS1", "\ud83e\udd49 DELL1", "4.  KIMP2", "5.  DIGS2", "6.  WELW4", "7.  KNEB3", "8.  HODD1"],
+      datasets: [{
+        data: [3, 3, 3, 2, 1, 0, 0, 0],
+        backgroundColor: ["rgba(74,222,128,0.92)", "rgba(66,204,117,0.86)", "rgba(59,187,106,0.8)", "rgba(51,170,95,0.74)", "rgba(44,152,84,0.68)", "rgba(36,135,73,0.62)", "rgba(29,118,62,0.56)", "rgba(22,101,52,0.5)"],
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var i = ctx.dataIndex;
+              return '  Sets: ' + ctx.raw + '   Games: ' + [32, 29, 28, 18, 21, 11, 10, 7][i] + '   Played: ' + [1, 1, 1, 1, 1, 1, 1, 1][i];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#64748b', stepSize: 1, precision: 0 },
+          title: { display: true, text: 'Sets Won', color: '#475569', font: { size: 11 } }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#cbd5e1', font: { size: 12 } }
+        }
+      },
+      maintainAspectRatio: false,
+      animation: { duration: 500 }
+    }
+  });
+  new Chart(document.getElementById("c3"), {
+    type: 'bar',
+    data: {
+      labels: ["\ud83e\udd47 ODYS2", "\ud83e\udd48 ORCH2", "\ud83e\udd49 CODI3", "4.  KNEB2", "5.  HITC2", "6.  WHEA2", "7.  DIGS1", "8.  LEGE1"],
+      datasets: [{
+        data: [2, 2, 2, 2, 1, 1, 1, 1],
+        backgroundColor: ["rgba(74,222,128,0.92)", "rgba(66,204,117,0.86)", "rgba(59,187,106,0.8)", "rgba(51,170,95,0.74)", "rgba(44,152,84,0.68)", "rgba(36,135,73,0.62)", "rgba(29,118,62,0.56)", "rgba(22,101,52,0.5)"],
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var i = ctx.dataIndex;
+              return '  Sets: ' + ctx.raw + '   Games: ' + [23, 22, 21, 18, 21, 18, 17, 16][i] + '   Played: ' + [1, 1, 1, 1, 1, 1, 1, 1][i];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#64748b', stepSize: 1, precision: 0 },
+          title: { display: true, text: 'Sets Won', color: '#475569', font: { size: 11 } }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#cbd5e1', font: { size: 12 } }
+        }
+      },
+      maintainAspectRatio: false,
+      animation: { duration: 500 }
+    }
+  });
+  new Chart(document.getElementById("c4"), {
+    type: 'bar',
+    data: {
+      labels: ["\ud83e\udd47 WEST1", "\ud83e\udd48 PIRT2", "\ud83e\udd49 WATT2", "4.  WHEA3", "5.  ODYS4", "6.  LEGE2", "7.  HITC4", "8.  CODI4"],
+      datasets: [{
+        data: [3, 3, 2, 2, 1, 1, 0, 0],
+        backgroundColor: ["rgba(74,222,128,0.92)", "rgba(66,204,117,0.86)", "rgba(59,187,106,0.8)", "rgba(51,170,95,0.74)", "rgba(44,152,84,0.68)", "rgba(36,135,73,0.62)", "rgba(29,118,62,0.56)", "rgba(22,101,52,0.5)"],
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var i = ctx.dataIndex;
+              return '  Sets: ' + ctx.raw + '   Games: ' + [27, 26, 23, 17, 22, 16, 13, 12][i] + '   Played: ' + [1, 1, 1, 1, 1, 1, 1, 1][i];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#64748b', stepSize: 1, precision: 0 },
+          title: { display: true, text: 'Sets Won', color: '#475569', font: { size: 11 } }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#cbd5e1', font: { size: 12 } }
+        }
+      },
+      maintainAspectRatio: false,
+      animation: { duration: 500 }
+    }
+  });
+  new Chart(document.getElementById("c5"), {
+    type: 'bar',
+    data: {
+      labels: ["\ud83e\udd47 HITC3", "\ud83e\udd48 WATT1", "\ud83e\udd49 ORCH3", "4.  ODYS3", "5.  ELLI3", "6.  ASHW1", "7.  KIMP3", "8.  DIGS3"],
+      datasets: [{
+        data: [2, 2, 2, 1, 1, 1, 0, 0],
+        backgroundColor: ["rgba(74,222,128,0.92)", "rgba(66,204,117,0.86)", "rgba(59,187,106,0.8)", "rgba(51,170,95,0.74)", "rgba(44,152,84,0.68)", "rgba(36,135,73,0.62)", "rgba(29,118,62,0.56)", "rgba(22,101,52,0.5)"],
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var i = ctx.dataIndex;
+              return '  Sets: ' + ctx.raw + '   Games: ' + [25, 24, 21, 18, 15, 14, 0, 0][i] + '   Played: ' + [1, 1, 1, 1, 1, 1, 0, 0][i];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#64748b', stepSize: 1, precision: 0 },
+          title: { display: true, text: 'Sets Won', color: '#475569', font: { size: 11 } }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#cbd5e1', font: { size: 12 } }
+        }
+      },
+      maintainAspectRatio: false,
+      animation: { duration: 500 }
+    }
+  });
+  new Chart(document.getElementById("c6"), {
+    type: 'bar',
+    data: {
+      labels: ["\ud83e\udd47 DELL2", "\ud83e\udd48 PIRT3", "\ud83e\udd49 WATT4", "4.  DATCH", "5.  LIST2", "6.  ST M1", "7.  WHEA4", "8.  ODYS5"],
+      datasets: [{
+        data: [3, 2, 2, 2, 1, 1, 1, 0],
+        backgroundColor: ["rgba(74,222,128,0.92)", "rgba(66,204,117,0.86)", "rgba(59,187,106,0.8)", "rgba(51,170,95,0.74)", "rgba(44,152,84,0.68)", "rgba(36,135,73,0.62)", "rgba(29,118,62,0.56)", "rgba(22,101,52,0.5)"],
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var i = ctx.dataIndex;
+              return '  Sets: ' + ctx.raw + '   Games: ' + [27, 25, 24, 23, 16, 15, 14, 12][i] + '   Played: ' + [1, 1, 1, 1, 1, 1, 1, 1][i];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#64748b', stepSize: 1, precision: 0 },
+          title: { display: true, text: 'Sets Won', color: '#475569', font: { size: 11 } }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#cbd5e1', font: { size: 12 } }
+        }
+      },
+      maintainAspectRatio: false,
+      animation: { duration: 500 }
+    }
+  });
+  new Chart(document.getElementById("c7"), {
+    type: 'bar',
+    data: {
+      labels: ["\ud83e\udd47 LETC2", "\ud83e\udd48 ORCH4", "\ud83e\udd49 WATT3", "4.  CODI5", "5.  WHEA5", "6.  ASHW2", "7.  WELW5", "8.  KIMP4"],
+      datasets: [{
+        data: [3, 2, 2, 2, 1, 1, 1, 0],
+        backgroundColor: ["rgba(74,222,128,0.92)", "rgba(66,204,117,0.86)", "rgba(59,187,106,0.8)", "rgba(51,170,95,0.74)", "rgba(44,152,84,0.68)", "rgba(36,135,73,0.62)", "rgba(29,118,62,0.56)", "rgba(22,101,52,0.5)"],
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var i = ctx.dataIndex;
+              return '  Sets: ' + ctx.raw + '   Games: ' + [33, 25, 23, 19, 20, 16, 14, 6][i] + '   Played: ' + [1, 1, 1, 1, 1, 1, 1, 1][i];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#64748b', stepSize: 1, precision: 0 },
+          title: { display: true, text: 'Sets Won', color: '#475569', font: { size: 11 } }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#cbd5e1', font: { size: 12 } }
+        }
+      },
+      maintainAspectRatio: false,
+      animation: { duration: 500 }
+    }
+  });
+  new Chart(document.getElementById("c8"), {
+    type: 'bar',
+    data: {
+      labels: ["\ud83e\udd47 DELL3", "\ud83e\udd48 TEWI1", "\ud83e\udd49 ELLI4", "4.  ASTO3", "5.  WYMOY", "6.  WELW6", "7.  LEGE3", "8.  CODI6"],
+      datasets: [{
+        data: [3, 2, 2, 2, 1, 1, 1, 0],
+        backgroundColor: ["rgba(74,222,128,0.92)", "rgba(66,204,117,0.86)", "rgba(59,187,106,0.8)", "rgba(51,170,95,0.74)", "rgba(44,152,84,0.68)", "rgba(36,135,73,0.62)", "rgba(29,118,62,0.56)", "rgba(22,101,52,0.5)"],
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var i = ctx.dataIndex;
+              return '  Sets: ' + ctx.raw + '   Games: ' + [29, 26, 24, 22, 17, 15, 13, 10][i] + '   Played: ' + [1, 1, 1, 1, 1, 1, 1, 1][i];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#64748b', stepSize: 1, precision: 0 },
+          title: { display: true, text: 'Sets Won', color: '#475569', font: { size: 11 } }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#cbd5e1', font: { size: 12 } }
+        }
+      },
+      maintainAspectRatio: false,
+      animation: { duration: 500 }
+    }
+  });
+  new Chart(document.getElementById("c9"), {
+    type: 'bar',
+    data: {
+      labels: ["\ud83e\udd47 CODI7", "\ud83e\udd48 KIMP5", "\ud83e\udd49 ORCH5", "4.  ASTO2", "5.  DIGS4", "6.  DELL4", "7.  ST M2", "8.  HITC5"],
+      datasets: [{
+        data: [3, 2, 2, 2, 1, 1, 1, 0],
+        backgroundColor: ["rgba(74,222,128,0.92)", "rgba(66,204,117,0.86)", "rgba(59,187,106,0.8)", "rgba(51,170,95,0.74)", "rgba(44,152,84,0.68)", "rgba(36,135,73,0.62)", "rgba(29,118,62,0.56)", "rgba(22,101,52,0.5)"],
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var i = ctx.dataIndex;
+              return '  Sets: ' + ctx.raw + '   Games: ' + [23, 26, 24, 20, 19, 15, 13, 16][i] + '   Played: ' + [1, 1, 1, 1, 1, 1, 1, 1][i];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#64748b', stepSize: 1, precision: 0 },
+          title: { display: true, text: 'Sets Won', color: '#475569', font: { size: 11 } }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#cbd5e1', font: { size: 12 } }
+        }
+      },
+      maintainAspectRatio: false,
+      animation: { duration: 500 }
+    }
+  });
+  new Chart(document.getElementById("c10"), {
+    type: 'bar',
+    data: {
+      labels: ["\ud83e\udd47 WATT5", "\ud83e\udd48 ST PS", "\ud83e\udd49 KNEB5", "4.  KIMP6", "5.  WEST2", "6.  ODYS6", "7.  WHEA6", "8.  DELL5"],
+      datasets: [{
+        data: [3, 2, 2, 2, 1, 1, 1, 0],
+        backgroundColor: ["rgba(74,222,128,0.92)", "rgba(66,204,117,0.86)", "rgba(59,187,106,0.8)", "rgba(51,170,95,0.74)", "rgba(44,152,84,0.68)", "rgba(36,135,73,0.62)", "rgba(29,118,62,0.56)", "rgba(22,101,52,0.5)"],
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var i = ctx.dataIndex;
+              return '  Sets: ' + ctx.raw + '   Games: ' + [27, 25, 22, 20, 19, 17, 14, 12][i] + '   Played: ' + [1, 1, 1, 1, 1, 1, 1, 1][i];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#64748b', stepSize: 1, precision: 0 },
+          title: { display: true, text: 'Sets Won', color: '#475569', font: { size: 11 } }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#cbd5e1', font: { size: 12 } }
+        }
+      },
+      maintainAspectRatio: false,
+      animation: { duration: 500 }
+    }
+  });
+  new Chart(document.getElementById("c11"), {
+    type: 'bar',
+    data: {
+      labels: ["\ud83e\udd47 ORCH6", "\ud83e\udd48 TEWI2", "\ud83e\udd49 HODD2", "4.  KNEB4", "5.  WELW7", "6.  ASHW3", "7.  DELL6", "8.  HITC6"],
+      datasets: [{
+        data: [3, 3, 3, 2, 1, 0, 0, 0],
+        backgroundColor: ["rgba(74,222,128,0.92)", "rgba(66,204,117,0.86)", "rgba(59,187,106,0.8)", "rgba(51,170,95,0.74)", "rgba(44,152,84,0.68)", "rgba(36,135,73,0.62)", "rgba(29,118,62,0.56)", "rgba(22,101,52,0.5)"],
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var i = ctx.dataIndex;
+              return '  Sets: ' + ctx.raw + '   Games: ' + [29, 28, 25, 25, 14, 14, 11, 10][i] + '   Played: ' + [1, 1, 1, 1, 1, 1, 1, 1][i];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#64748b', stepSize: 1, precision: 0 },
+          title: { display: true, text: 'Sets Won', color: '#475569', font: { size: 11 } }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#cbd5e1', font: { size: 12 } }
+        }
+      },
+      maintainAspectRatio: false,
+      animation: { duration: 500 }
+    }
+  });
+  new Chart(document.getElementById("c12"), {
+    type: 'bar',
+    data: {
+      labels: ["\ud83e\udd47 DIGS5", "\ud83e\udd48 WELW8", "\ud83e\udd49 LIST3", "4.  LETC3", "5.  ASTO4", "6.  KIMP7", "7.  CODI8", "8.  KNEB6"],
+      datasets: [{
+        data: [3, 3, 3, 2, 1, 0, 0, 0],
+        backgroundColor: ["rgba(74,222,128,0.92)", "rgba(66,204,117,0.86)", "rgba(59,187,106,0.8)", "rgba(51,170,95,0.74)", "rgba(44,152,84,0.68)", "rgba(36,135,73,0.62)", "rgba(29,118,62,0.56)", "rgba(22,101,52,0.5)"],
+        borderRadius: 5,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var i = ctx.dataIndex;
+              return '  Sets: ' + ctx.raw + '   Games: ' + [33, 32, 30, 26, 13, 9, 7, 6][i] + '   Played: ' + [1, 1, 1, 1, 1, 1, 1, 1][i];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#64748b', stepSize: 1, precision: 0 },
+          title: { display: true, text: 'Sets Won', color: '#475569', font: { size: 11 } }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#cbd5e1', font: { size: 12 } }
+        }
+      },
+      maintainAspectRatio: false,
+      animation: { duration: 500 }
+    }
+  });
+</script>
+</body>
+</html>
