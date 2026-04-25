@@ -3,7 +3,16 @@ name: Update tennis data
 on:
   schedule:
     - cron: '0 5 * * 4'  # Every Thursday 05:00 UTC
-  workflow_dispatch:       # Also triggerable manually from GitHub UI
+  workflow_dispatch:
+    inputs:
+      no_results:
+        description: 'Skip re-downloading results'
+        type: boolean
+        default: false
+      refresh_schedule:
+        description: 'Re-download and re-parse the fixture schedule'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -22,7 +31,11 @@ jobs:
         run: pip install -e .
 
       - name: Run update
-        run: python scripts/update.py
+        run: |
+          ARGS=""
+          [ "${{ github.event.inputs.no_results }}" = "true" ] && ARGS="$ARGS --no-results"
+          [ "${{ github.event.inputs.refresh_schedule }}" = "true" ] && ARGS="$ARGS --refresh-schedule"
+          python scripts/update.py $ARGS
 
       - name: Commit updated CSVs
         run: |
