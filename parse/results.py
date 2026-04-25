@@ -5,7 +5,7 @@ import requests
 import xlrd
 from datetime import datetime
 from typing import Any
-from config import PROJECT_ROOT
+from parse import PROJECT_ROOT
 from parse import TEAM_ABBREVIATIONS
 
 

@@ -1,7 +1,7 @@
 
 import csv
 import pathlib
-from config import PROJECT_ROOT
+from parse import PROJECT_ROOT
 
 
 

@@ -5,7 +5,7 @@ import pathlib
 import requests
 import openpyxl
 from datetime import datetime
-from config import PROJECT_ROOT
+from parse import PROJECT_ROOT
 
 
 
