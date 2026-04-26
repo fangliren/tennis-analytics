@@ -9,7 +9,7 @@ COMBINED_CSV      = PROJECT_ROOT / "tables" / "combined" / "combined.csv"
 LEAGUES_TABLES_DIR = PROJECT_ROOT / "tables" / "leagues"
 
 
-def leagues(combined_csv: pathlib.Path) -> None:
+def leagues(combined_csv: pathlib.Path, out_path: pathlib.Path = None) -> None:
     totals: dict[tuple[str, str], dict[str, int]] = defaultdict(
         lambda: {"played": 0, "sets_won": 0, "games_won": 0}
     )
@@ -40,8 +40,9 @@ def leagues(combined_csv: pathlib.Path) -> None:
     ]
     rows.sort(key=lambda r: (r["division"], -r["sets_won"], -r["games_won"]))
 
-    LEAGUES_TABLES_DIR.mkdir(parents=True, exist_ok=True)
-    out_path = LEAGUES_TABLES_DIR / "leagues.csv"
+    if out_path is None:
+        out_path = LEAGUES_TABLES_DIR / "leagues.csv"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(out_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["division", "team", "played", "sets_won", "games_won"])

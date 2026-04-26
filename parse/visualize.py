@@ -7,9 +7,10 @@ from datetime import date
 from parse import PROJECT_ROOT
 
 
-LEAGUES_CSV  = PROJECT_ROOT / "tables" / "leagues"  / "leagues.csv"
-COMBINED_CSV = PROJECT_ROOT / "tables" / "combined" / "combined.csv"
-LEAGUES_HTML = PROJECT_ROOT / "tables" / "leagues"  / "leagues.html"
+LEAGUES_CSV   = PROJECT_ROOT / "tables" / "leagues"  / "leagues.csv"
+COMBINED_CSV  = PROJECT_ROOT / "tables" / "combined" / "combined.csv"
+LEAGUES_HTML  = PROJECT_ROOT / "tables" / "leagues"  / "leagues.html"
+HISTORIC_DIR  = PROJECT_ROOT / "tables" / "historic"
 
 def _div_group(division: str) -> int:
     return int("".join(c for c in division if c.isdigit()))
@@ -46,37 +47,81 @@ function tipHide(el) {
   if (el && el._mm) el.removeEventListener('mousemove', el._mm);
 }
 
-const FIXTURES = __FIXTURES__;
+const FIXTURES     = __FIXTURES__;
+const ALL_FIXTURES = __ALL_FIXTURES__;
+
+var _prevState = null;
+
+function _fixtureRow(f, showDiv, showYear, clickable) {
+  var played = f.hs !== null;
+  var score  = played
+    ? f.hs + '–' + f.vs + '<br><small>' + f.hg + '–' + f.vg + ' games</small>'
+    : '—';
+  var dc = showDiv  ? '<td>' + f.v + '</td>' : '';
+  var yc = showYear ? '<td class="yr">' + f.y + '</td>' : '';
+  var cls = (played ? 'pl' : 'up') + (clickable ? ' h2h-link' : '');
+  var oc  = clickable
+    ? " onclick='showH2H(" + JSON.stringify(f.h) + "," + JSON.stringify(f.a) + ")'"
+    : '';
+  return '<tr class="' + cls + '"' + oc + '>'
+    + '<td>' + f.d + '</td>' + dc + yc
+    + '<td class="tm">' + f.h + '</td>'
+    + '<td class="sc">' + score + '</td>'
+    + '<td class="tm">' + f.a + '</td>'
+    + '</tr>';
+}
 
 function showTeam(team) {
-  openModal(team, FIXTURES.filter(f => f.h === team || f.a === team), false);
+  _prevState = null;
+  var rows = FIXTURES.filter(function(f) { return f.h === team || f.a === team; })
+                     .sort(function(a,b) { return a.d < b.d ? -1 : 1; });
+  _renderModal(team, rows, false, false, true);
 }
 function showDivision(div) {
-  openModal('Division ' + div, FIXTURES.filter(f => f.v === div), true);
+  _prevState = null;
+  var rows = FIXTURES.filter(function(f) { return f.v === div; })
+                     .sort(function(a,b) { return a.d < b.d ? -1 : 1; });
+  _renderModal('Division ' + div, rows, true, false, true);
 }
-function openModal(title, rows, showDiv) {
-  rows = rows.slice().sort((a, b) => a.d < b.d ? -1 : 1);
-  document.getElementById('mo-title').textContent = title;
-  document.getElementById('th-div').style.display = showDiv ? '' : 'none';
-  document.getElementById('mo-rows').innerHTML = rows.map(f => {
-    const played = f.hs !== null;
-    const score  = played
-      ? f.hs + '–' + f.vs + '<br><small>' + f.hg + '–' + f.vg + ' games</small>'
-      : '—';
-    const dc = showDiv ? '<td>' + f.v + '</td>' : '';
-    return '<tr class="' + (played ? 'pl' : 'up') + '">'
-      + '<td>' + f.d + '</td>' + dc
-      + '<td class="tm">' + f.h + '</td>'
-      + '<td class="sc">' + score + '</td>'
-      + '<td class="tm">' + f.a + '</td>'
-      + '</tr>';
-  }).join('');
+function showH2H(home, away) {
+  _prevState = {
+    html:    document.getElementById('mo-rows').innerHTML,
+    title:   document.getElementById('mo-title').textContent,
+    showDiv: document.getElementById('th-div').style.display  !== 'none',
+    showYr:  document.getElementById('th-yr').style.display   !== 'none',
+    showBk:  document.getElementById('mo-back').style.display !== 'none',
+  };
+  var rows = ALL_FIXTURES.filter(function(f) {
+    return (f.h === home && f.a === away) || (f.h === away && f.a === home);
+  }).sort(function(a,b) { return a.d > b.d ? -1 : 1; });
+  _renderModal(home + ' vs ' + away, rows, true, true, false);
+  document.getElementById('mo-back').style.display = '';
+}
+function goBack() {
+  if (!_prevState) return;
+  document.getElementById('mo-title').textContent         = _prevState.title;
+  document.getElementById('mo-rows').innerHTML            = _prevState.html;
+  document.getElementById('th-div').style.display         = _prevState.showDiv ? '' : 'none';
+  document.getElementById('th-yr').style.display          = _prevState.showYr  ? '' : 'none';
+  document.getElementById('mo-back').style.display        = _prevState.showBk  ? '' : 'none';
+  document.getElementById('mo-scroll').scrollTop = 0;
+  _prevState = null;
+}
+function _renderModal(title, rows, showDiv, showYear, clickable) {
+  document.getElementById('mo-title').textContent  = title;
+  document.getElementById('th-div').style.display  = showDiv  ? '' : 'none';
+  document.getElementById('th-yr').style.display   = showYear ? '' : 'none';
+  document.getElementById('mo-back').style.display = 'none';
+  document.getElementById('mo-rows').innerHTML =
+    rows.map(function(f) { return _fixtureRow(f, showDiv, showYear, clickable); }).join('');
+  document.getElementById('mo-scroll').scrollTop = 0;
   document.getElementById('modal').style.display = 'flex';
 }
 function closeModal() {
   document.getElementById('modal').style.display = 'none';
+  _prevState = null;
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
 """
 
 _HTML = """\
@@ -169,6 +214,13 @@ h1 { text-align: center; font-size: 2rem; color: #86efac;
 #mo-table td.sc { text-align: center; color: #86efac; font-weight: 600; white-space: nowrap; }
 #mo-table tr.up td.sc { color: #334155; }
 #mo-table small { color: #64748b; font-weight: 400; }
+#mo-table td.yr { color: #475569; font-size: .78rem; }
+#mo-table tr.h2h-link { cursor: pointer; }
+#mo-table tr.h2h-link:hover td { background: rgba(96,165,250,0.06); }
+#mo-back { background: none; border: 1px solid #334155; color: #94a3b8;
+           font-size: .8rem; cursor: pointer; padding: 4px 10px;
+           border-radius: 6px; margin-right: 8px; display: none; }
+#mo-back:hover { background: #334155; color: #e2e8f0; }
 </style>
 </head>
 <body>
@@ -185,7 +237,10 @@ __CARDS__
 <div id="modal" onclick="if(event.target===this)closeModal()">
   <div id="modal-panel">
     <div id="mo-hdr">
-      <span id="mo-title"></span>
+      <div style="display:flex;align-items:center;gap:4px">
+        <button id="mo-back" onclick="goBack()">&#8592; Back</button>
+        <span id="mo-title"></span>
+      </div>
       <button id="mo-close" onclick="closeModal()">&#x2715;</button>
     </div>
     <div id="mo-scroll">
@@ -193,6 +248,7 @@ __CARDS__
         <thead><tr>
           <th>Date</th>
           <th id="th-div" style="display:none">Div</th>
+          <th id="th-yr" style="display:none">Year</th>
           <th>Home</th>
           <th>Score</th>
           <th>Away</th>
@@ -307,25 +363,44 @@ def _make_card(division: str, rows: list[dict], max_group: int,
     )
 
 
-def visualize(leagues_csv: pathlib.Path, combined_csv: pathlib.Path = COMBINED_CSV) -> None:
+def _read_fixtures(combined_csv: pathlib.Path, include_unplayed: bool = True) -> list[dict]:
+    rows = []
+    with open(combined_csv) as f:
+        for r in csv.DictReader(f):
+            played = r["home_sets"] != ""
+            if not played and not include_unplayed:
+                continue
+            rows.append({
+                "y":  r["fixture_date"][:4],
+                "d":  r["fixture_date"],
+                "v":  r["division"],
+                "h":  r["home_team"],
+                "a":  r["away_team"],
+                "hs": int(r["home_sets"])  if played else None,
+                "hg": int(r["home_games"]) if played else None,
+                "vs": int(r["away_sets"])  if played else None,
+                "vg": int(r["away_games"]) if played else None,
+            })
+    return rows
+
+
+def visualize(leagues_csv: pathlib.Path, combined_csv: pathlib.Path = COMBINED_CSV,
+              historic_dir: pathlib.Path = HISTORIC_DIR) -> None:
     divisions: dict[str, list[dict]] = defaultdict(list)
     with open(leagues_csv) as f:
         for row in csv.DictReader(f):
             divisions[row["division"]].append(row)
 
-    fixtures = []
-    with open(combined_csv) as f:
-        for r in csv.DictReader(f):
-            fixtures.append({
-                "d":  r["fixture_date"],
-                "v":  r["division"],
-                "h":  r["home_team"],
-                "a":  r["away_team"],
-                "hs": int(r["home_sets"])  if r["home_sets"]  != "" else None,
-                "hg": int(r["home_games"]) if r["home_games"] != "" else None,
-                "vs": int(r["away_sets"])  if r["away_sets"]  != "" else None,
-                "vg": int(r["away_games"]) if r["away_games"] != "" else None,
-            })
+    # Current-season fixtures (including unplayed) — used for team/division modals.
+    fixtures = _read_fixtures(combined_csv, include_unplayed=True)
+
+    # All fixtures across seasons — used for H2H lookup.
+    all_fixtures = list(fixtures)
+    if historic_dir.exists():
+        for year_dir in sorted(historic_dir.iterdir()):
+            hist_csv = year_dir / "combined.csv"
+            if hist_csv.exists():
+                all_fixtures.extend(_read_fixtures(hist_csv, include_unplayed=False))
 
     max_group = max(_div_group(d) for d in divisions)
 
@@ -351,7 +426,9 @@ def visualize(leagues_csv: pathlib.Path, combined_csv: pathlib.Path = COMBINED_C
         for div in sorted(divisions)
     ]
 
-    page_js = _PAGE_JS.replace("__FIXTURES__", json.dumps(fixtures))
+    page_js = (_PAGE_JS
+               .replace("__FIXTURES__",     json.dumps(fixtures))
+               .replace("__ALL_FIXTURES__", json.dumps(all_fixtures)))
 
     html = (
         _HTML
