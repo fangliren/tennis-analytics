@@ -11,14 +11,12 @@ Key differences from the current-season pipeline:
 """
 
 import csv
-import pathlib
 import traceback
 import requests
-from datetime import datetime
 
 from parse import PROJECT_ROOT
 from parse import expand as _expand_current
-from parse.results import COLUMNS_NEEDED, RENAME, _parse_result_rows
+from parse.results import _parse_result_rows
 from parse.schedule import _parse_schedule_rows
 from parse.combine import RESULT_FIELDS
 from parse.leagues import leagues as _leagues
@@ -30,8 +28,8 @@ HISTORIC_TABLES_DIR = PROJECT_ROOT / "tables" / "historic"
 # Historic results files store full club names but sometimes use alias spellings
 # that differ from the canonical name in TEAM_ABBREVIATIONS.
 HISTORIC_NAME_ALIASES = {
-    "WHEATHAM":  "WHEATHAMPSTEAD",   # alias used in older results XLS
-    "ST MARGS":  "ST MARG",          # alias used in older results XLS
+    "WHEATHAM": "WHEATHAMPSTEAD",  # alias used in older results XLS
+    "ST MARGS": "ST MARG",         # alias used in older results XLS
 }
 
 
@@ -48,16 +46,16 @@ def _normalize(full_name):
 # Abbreviation prefixes used in historic Matrix files that differ from the current season.
 # None means the team is a placeholder/unknown and should be skipped.
 HISTORIC_ABBREVS = {
-    "DATC":  "DATCHWORTH",   # 2021  (current season uses DATCH)
-    "HBST":  "HBSTC",        # 2021  (club no longer in the league)
-    "GOSL":  "GOSLING",      # 2022  (current uses GOSLG)
-    "HODDN": "HODDESDON",    # 2022-2024  (current uses HODD)
-    "LISTR": "LISTER",       # 2022  (current uses LIST)
-    "WYMO":  "WYMONDLEY",    # 2021  (current uses WYMOY)
-    "WESTN": "WESTON",       # 2024  (current uses WEST)
-    "ST P":  "ST PAULS",     # 2021-2022  (current uses ST PS)
-    "XXXX":  None,           # fixture-grid placeholders — skip
-    "SPAR":  None,           # club never appeared in results — skip
+    "DATC": "DATCHWORTH",   # 2021  (current season uses DATCH)
+    "HBST": "HBSTC",        # 2021  (club no longer in the league)
+    "GOSL": "GOSLING",      # 2022  (current uses GOSLG)
+    "HODDN": "HODDESDON",   # 2022-2024  (current uses HODD)
+    "LISTR": "LISTER",      # 2022  (current uses LIST)
+    "WYMO": "WYMONDLEY",    # 2021  (current uses WYMOY)
+    "WESTN": "WESTON",      # 2024  (current uses WEST)
+    "ST P": "ST PAULS",     # 2021-2022  (current uses ST PS)
+    "XXXX": None,           # fixture-grid placeholders — skip
+    "SPAR": None,           # club never appeared in results — skip
 }
 
 
@@ -114,9 +112,9 @@ def _schedule_from_results(results_rows):
             seen.add(key)
             fixtures.append({
                 "fixture_date": r["fixture_date"],
-                "division":     r["division"],
-                "home_team":    r["home_team"],
-                "away_team":    r["away_team"],
+                "division": r["division"],
+                "home_team": r["home_team"],
+                "away_team": r["away_team"],
             })
     return fixtures
 
@@ -154,7 +152,7 @@ if __name__ == "__main__":
             year_dl = DOWNLOAD_DIR / str(year)
             year_dl.mkdir(parents=True, exist_ok=True)
 
-            results_path  = year_dl / f"{year}Results.xls"
+            results_path = year_dl / f"{year}Results.xls"
             schedule_path = year_dl / f"{year}Matrix.xlsx"
 
             if not _download(f"https://www.datchworth.net/images/{year}Results.xls", results_path):

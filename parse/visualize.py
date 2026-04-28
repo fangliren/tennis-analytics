@@ -297,20 +297,30 @@ def _position_zones(division: str, n: int, max_group: int) -> list[str]:
     group = _div_group(division)
 
     if division == "1":
-        if n > 0: zones[0] = "champion"
-        for i in range(max(1, n - 2), n): zones[i] = "relegation"
+        if n > 0:
+            zones[0] = "champion"
+        for i in range(max(1, n - 2), n):
+            zones[i] = "relegation"
     elif division == "2":
-        for i in range(min(2, n)): zones[i] = "promotion"
-        for i in range(max(2, n - 3), n): zones[i] = "relegation"
+        for i in range(min(2, n)):
+            zones[i] = "promotion"
+        for i in range(max(2, n - 3), n):
+            zones[i] = "relegation"
     elif division in ("3A", "3B"):
-        if n > 0: zones[0] = "promotion"
-        if n > 1: zones[1] = "chasing"  # overridden dynamically in visualize()
-        for i in range(max(2, n - 2), n): zones[i] = "relegation"
+        if n > 0:
+            zones[0] = "promotion"
+        if n > 1:
+            zones[1] = "chasing"  # overridden dynamically in visualize()
+        for i in range(max(2, n - 2), n):
+            zones[i] = "relegation"
     elif group == max_group:
-        for i in range(min(2, n)): zones[i] = "promotion"  # no relegation
+        for i in range(min(2, n)):
+            zones[i] = "promotion"  # no relegation
     else:
-        for i in range(min(2, n)): zones[i] = "promotion"
-        for i in range(max(2, n - 2), n): zones[i] = "relegation"
+        for i in range(min(2, n)):
+            zones[i] = "promotion"
+        for i in range(max(2, n - 2), n):
+            zones[i] = "relegation"
 
     return zones
 

@@ -55,7 +55,7 @@ def _parse_schedule_rows(xlsx_path: pathlib.Path, expand_fn=expand) -> list:
 
         for div_name, col_idx in divisions:
             for row in group:
-                home_raw = row[col_idx]     if col_idx     < len(row) else None
+                home_raw = row[col_idx] if col_idx < len(row) else None
                 away_raw = row[col_idx + 1] if col_idx + 1 < len(row) else None
                 if home_raw is not None and away_raw is not None:
                     home = expand_fn(str(home_raw))
@@ -64,9 +64,9 @@ def _parse_schedule_rows(xlsx_path: pathlib.Path, expand_fn=expand) -> list:
                         continue
                     fixtures.append({
                         "fixture_date": fixture_date,
-                        "division":     div_name,
-                        "home_team":    home,
-                        "away_team":    away,
+                        "division": div_name,
+                        "home_team": home,
+                        "away_team": away,
                     })
     return fixtures
 

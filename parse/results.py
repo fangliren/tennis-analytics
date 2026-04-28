@@ -3,6 +3,7 @@ import pathlib
 import requests
 import xlrd
 from datetime import datetime
+from typing import Any, Callable
 from parse import PROJECT_ROOT, TEAM_ABBREVIATIONS, expand
 
 
@@ -13,13 +14,13 @@ TABLES_DIR = PROJECT_ROOT / "tables" / "results"
 COLUMNS_NEEDED = ["MyTeam", "DIV", "FixDate", "HomeAway", "Oppo", "SetsWon", "GamesWon", "SetsLost", "GamesLost"]
 
 RENAME = {
-    "MyTeam":    "home_team",
-    "DIV":       "division",
-    "FixDate":   "fixture_date",
-    "Oppo":      "away_team",
-    "SetsWon":   "home_sets",
-    "GamesWon":  "home_games",
-    "SetsLost":  "away_sets",
+    "MyTeam": "home_team",
+    "DIV": "division",
+    "FixDate": "fixture_date",
+    "Oppo": "away_team",
+    "SetsWon": "home_sets",
+    "GamesWon": "home_games",
+    "SetsLost": "away_sets",
     "GamesLost": "away_games",
 }
 
@@ -31,14 +32,16 @@ def _abbreviate(full_name: str) -> str:
     return TEAM_ABBREVIATIONS[full_name]
 
 
-def _parse_result_rows(xls_path: pathlib.Path, team_fn=None) -> list:
+def _current_season_team_fn(name: str) -> str:
+    return expand(_abbreviate(name))
+
+
+def _parse_result_rows(xls_path: pathlib.Path, team_fn: Callable[[str], str] = _current_season_team_fn) -> list[dict[str, Any]]:
     """Parse a results XLS file and return a list of result dicts.
 
     team_fn(name) normalises each raw team name string.  Defaults to the
     current-season round-trip: expand(_abbreviate(name)).
     """
-    if team_fn is None:
-        team_fn = lambda name: expand(_abbreviate(name))
 
     wb = xlrd.open_workbook(str(xls_path))
     ws = wb.sheet_by_index(0)
@@ -51,17 +54,17 @@ def _parse_result_rows(xls_path: pathlib.Path, team_fn=None) -> list:
         if raw[col_index["HomeAway"]] != "Home":
             continue
 
-        record = {RENAME.get(col, col): raw[col_index[col]]
-                  for col in COLUMNS_NEEDED if col != "HomeAway"}
+        record: dict[str, Any] = {RENAME.get(col, col): raw[col_index[col]]
+                                   for col in COLUMNS_NEEDED if col != "HomeAway"}
 
-        record["home_team"]    = team_fn(record["home_team"])
-        record["away_team"]    = team_fn(record["away_team"])
+        record["home_team"] = team_fn(record["home_team"])
+        record["away_team"] = team_fn(record["away_team"])
         record["fixture_date"] = xlrd.xldate_as_datetime(record["fixture_date"], wb.datemode).date()
-        record["division"]     = record["division"].lstrip("0") or "0"
-        record["home_sets"]    = int(record["home_sets"])
-        record["away_sets"]    = int(record["away_sets"])
-        record["home_games"]   = int(record["home_games"])
-        record["away_games"]   = int(record["away_games"])
+        record["division"] = record["division"].lstrip("0") or "0"
+        record["home_sets"] = int(record["home_sets"])
+        record["away_sets"] = int(record["away_sets"])
+        record["home_games"] = int(record["home_games"])
+        record["away_games"] = int(record["away_games"])
 
         if record["home_sets"] + record["away_sets"] != 3:
             print(f"WARNING row {row_idx + 1}: home_sets + away_sets != 3")

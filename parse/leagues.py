@@ -1,11 +1,10 @@
-
 import csv
 import pathlib
 from collections import defaultdict
 from parse import PROJECT_ROOT
 
 
-COMBINED_CSV      = PROJECT_ROOT / "tables" / "combined" / "combined.csv"
+COMBINED_CSV = PROJECT_ROOT / "tables" / "combined" / "combined.csv"
 LEAGUES_TABLES_DIR = PROJECT_ROOT / "tables" / "leagues"
 
 
@@ -26,12 +25,12 @@ def leagues(combined_csv: pathlib.Path, out_path: pathlib.Path = None) -> None:
             if row["home_sets"] == "":
                 continue
 
-            totals[home_key]["played"]    += 1
-            totals[home_key]["sets_won"]  += int(row["home_sets"])
+            totals[home_key]["played"] += 1
+            totals[home_key]["sets_won"] += int(row["home_sets"])
             totals[home_key]["games_won"] += int(row["home_games"])
 
-            totals[away_key]["played"]    += 1
-            totals[away_key]["sets_won"]  += int(row["away_sets"])
+            totals[away_key]["played"] += 1
+            totals[away_key]["sets_won"] += int(row["away_sets"])
             totals[away_key]["games_won"] += int(row["away_games"])
 
     rows = [

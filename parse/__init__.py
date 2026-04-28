@@ -3,34 +3,34 @@ import pathlib
 PROJECT_ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 TEAM_ABBREVIATIONS = {
-    "ASHWELL":       "ASHW",
-    "ASTON":         "ASTO",
-    "CODICOTE":      "CODI",
-    "DATCHWORTH":    "DATCH",
-    "DELLCOTT":      "DELL",
-    "DIGSWELL":      "DIGS",
-    "ELLISWICK":     "ELLI",
-    "GOSLING":       "GOSLG",
-    "HITCHIN":       "HITC",
-    "HODDESDON":     "HODD",
-    "KIMPTON":       "KIMP",
-    "KNEBWORTH":     "KNEB",
-    "LEGENDS":       "LEGE",
-    "LETCHWORTH":    "LETC",
-    "LISTER":        "LIST",
-    "ODYSSEY":       "ODYS",
-    "ORCHARD":       "ORCH",
-    "PIRTON":        "PIRT",
-    "ST MARGS":       "ST M",   # alias used in results data — comes first
-    "ST PAULS":       "ST PS",
-    "TEWIN":          "TEWI",
-    "WATTON":         "WATT",
-    "WELWYN":         "WELW",
-    "WESTON":         "WEST",
-    "WHEATHAM":       "WHEA",   # alias used in results data — comes first
+    "ASHWELL": "ASHW",
+    "ASTON": "ASTO",
+    "CODICOTE": "CODI",
+    "DATCHWORTH": "DATCH",
+    "DELLCOTT": "DELL",
+    "DIGSWELL": "DIGS",
+    "ELLISWICK": "ELLI",
+    "GOSLING": "GOSLG",
+    "HITCHIN": "HITC",
+    "HODDESDON": "HODD",
+    "KIMPTON": "KIMP",
+    "KNEBWORTH": "KNEB",
+    "LEGENDS": "LEGE",
+    "LETCHWORTH": "LETC",
+    "LISTER": "LIST",
+    "ODYSSEY": "ODYS",
+    "ORCHARD": "ORCH",
+    "PIRTON": "PIRT",
+    "ST MARGS": "ST M",    # alias used in results data — comes first
+    "ST PAULS": "ST PS",
+    "TEWIN": "TEWI",
+    "WATTON": "WATT",
+    "WELWYN": "WELW",
+    "WESTON": "WEST",
+    "WHEATHAM": "WHEA",         # alias used in results data — comes first
     "WHEATHAMPSTEAD": "WHEA",   # canonical — comes last, wins reverse dict
-    "WYMONDLEY":      "WYMOY",
-    "ST MARG":        "ST M",   # canonical — comes last, wins reverse dict
+    "WYMONDLEY": "WYMOY",
+    "ST MARG": "ST M",          # canonical — comes last, wins reverse dict
 }
 
 # Reverse mapping: abbreviation prefix → canonical full club name.

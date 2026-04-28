@@ -3,9 +3,8 @@ import pathlib
 from parse import PROJECT_ROOT
 
 
-
 SCHEDULE_TABLES_DIR = PROJECT_ROOT / "tables" / "schedule"
-RESULTS_TABLES_DIR  = PROJECT_ROOT / "tables" / "results"
+RESULTS_TABLES_DIR = PROJECT_ROOT / "tables" / "results"
 COMBINED_TABLES_DIR = PROJECT_ROOT / "tables" / "combined"
 
 RESULT_FIELDS = ["home_sets", "home_games", "away_sets", "away_games"]
@@ -47,5 +46,5 @@ def combine(schedule_csv: pathlib.Path, results_csv: pathlib.Path) -> None:
 if __name__ == "__main__":
     combine(
         SCHEDULE_TABLES_DIR / "schedule.csv",
-        RESULTS_TABLES_DIR  / "results.csv",
+        RESULTS_TABLES_DIR / "results.csv",
     )
