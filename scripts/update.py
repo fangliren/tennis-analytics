@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 from parse.schedule import download_schedule, parse_schedule, SCHEDULE_LOCAL_DIR
 from parse.results  import download_results, parse_results, RESULTS_LOCAL_DIR
@@ -19,11 +20,17 @@ def main() -> None:
 
     if args.refresh_schedule:
         download_schedule()
-        parse_schedule(sorted(SCHEDULE_LOCAL_DIR.glob("*.xlsx"))[-1])
+        files = sorted(SCHEDULE_LOCAL_DIR.glob("*.xlsx"))
+        if not files:
+            sys.exit("No schedule files found after download")
+        parse_schedule(files[-1])
 
     if not args.no_results:
         download_results()
-        parse_results(sorted(RESULTS_LOCAL_DIR.glob("*.xls"))[-1])
+        files = sorted(RESULTS_LOCAL_DIR.glob("*.xls"))
+        if not files:
+            sys.exit("No results files found after download")
+        parse_results(files[-1])
 
     if not args.no_combine:
         combine(

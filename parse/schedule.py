@@ -1,5 +1,3 @@
-
-
 import csv
 import pathlib
 import requests
@@ -8,14 +6,12 @@ from datetime import datetime
 from parse import PROJECT_ROOT, expand
 
 
-
 SCHEDULE_ONLINE = "https://www.datchworth.net/Images/Matrix.xlsx"
 SCHEDULE_LOCAL_DIR = PROJECT_ROOT / "downloads" / "schedule"
 TABLES_DIR = PROJECT_ROOT / "tables" / "schedule"
 
 
 def download_schedule() -> None:
-
     SCHEDULE_LOCAL_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     local_path = SCHEDULE_LOCAL_DIR / f"schedule_{timestamp}.xlsx"
@@ -29,8 +25,12 @@ def download_schedule() -> None:
     print(f"Schedule downloaded to {local_path}")
 
 
-def parse_schedule(xlsx_path: pathlib.Path) -> None:
+def _parse_schedule_rows(xlsx_path: pathlib.Path, expand_fn=expand) -> list:
+    """Parse a schedule XLSX file and return a list of fixture dicts.
 
+    expand_fn(code) converts an abbreviation to a full team name.  Defaults to
+    the current-season expand(); historic callers pass their own variant.
+    """
     wb = openpyxl.load_workbook(xlsx_path)
     ws = wb.active
     assert ws is not None, "Workbook has no active sheet"
@@ -44,11 +44,9 @@ def parse_schedule(xlsx_path: pathlib.Path) -> None:
             divisions.append((str(div_name), col_idx))
 
     # Data starts at row 4 (skip first 3 header rows), grouped in chunks of 4
-    data_rows = rows[3:]
-
     fixtures = []
-    for group_start in range(0, len(data_rows), 4):
-        group = data_rows[group_start:group_start + 4]
+    for group_start in range(0, len(rows[3:]), 4):
+        group = rows[3:][group_start:group_start + 4]
         fixture_date = group[0][0]
         if fixture_date is None:
             continue
@@ -57,15 +55,24 @@ def parse_schedule(xlsx_path: pathlib.Path) -> None:
 
         for div_name, col_idx in divisions:
             for row in group:
-                home = row[col_idx]     if col_idx     < len(row) else None
-                away = row[col_idx + 1] if col_idx + 1 < len(row) else None
-                if home is not None and away is not None:
+                home_raw = row[col_idx]     if col_idx     < len(row) else None
+                away_raw = row[col_idx + 1] if col_idx + 1 < len(row) else None
+                if home_raw is not None and away_raw is not None:
+                    home = expand_fn(str(home_raw))
+                    away = expand_fn(str(away_raw))
+                    if home is None or away is None:
+                        continue
                     fixtures.append({
                         "fixture_date": fixture_date,
-                        "division": div_name,
-                        "home_team": expand(str(home)),
-                        "away_team": expand(str(away)),
+                        "division":     div_name,
+                        "home_team":    home,
+                        "away_team":    away,
                     })
+    return fixtures
+
+
+def parse_schedule(xlsx_path: pathlib.Path) -> None:
+    fixtures = _parse_schedule_rows(xlsx_path)
 
     TABLES_DIR.mkdir(parents=True, exist_ok=True)
     out_path = TABLES_DIR / "schedule.csv"

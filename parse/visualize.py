@@ -184,12 +184,17 @@ h1 { text-align: center; font-size: 2rem; color: #86efac;
 .t-btn:hover { background: rgba(96,165,250,0.28); border-color: rgba(96,165,250,0.55);
                color: #bfdbfe; }
 .t-bar-outer { flex: 1; height: 8px; background: rgba(255,255,255,0.05);
-               border-radius: 4px; overflow: hidden; min-width: 0; }
+               border-radius: 4px; overflow: hidden; min-width: 0;
+               display: flex; align-items: stretch; }
 .t-bar { height: 100%; border-radius: 4px;
-         transition: width .45s cubic-bezier(.4,0,.2,1); }
+         transition: width .45s cubic-bezier(.4,0,.2,1); flex-shrink: 0; }
+.t-bar-gih { height: 100%; background: rgba(255,255,255,0.13);
+             border-left: 1px dashed rgba(255,255,255,0.18); flex-shrink: 0; }
 .t-num { font-size: .8rem; color: #94a3b8; flex-shrink: 0;
          min-width: 58px; text-align: right; }
 .t-num small { color: #475569; font-size: .7rem; margin-left: 3px; }
+.t-gih { font-size: .65rem; color: #64748b; flex-shrink: 0;
+         margin-left: 2px; white-space: nowrap; }
 #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.65);
          z-index: 100; align-items: center; justify-content: center; padding: 20px; }
 #modal-panel { background: #1e293b; border-radius: 14px; border: 1px solid #334155;
@@ -317,7 +322,10 @@ def _rank(i: int) -> str:
 def _make_card(division: str, rows: list[dict], max_group: int,
                zone_overrides=None) -> str:
     sets_vals    = [int(r["sets_won"]) for r in rows]
-    max_sets     = max(sets_vals) if any(s > 0 for s in sets_vals) else 1
+    max_played   = max(int(r["played"]) for r in rows)
+    theoretical  = [s + (max_played - int(r["played"])) * 3
+                    for s, r in zip(sets_vals, rows)]
+    max_sets     = max(theoretical) if any(t > 0 for t in theoretical) else 1
     colors       = _bar_colors(len(rows), division, max_group)
     header_color = _header_color(division, max_group)
     zones        = _position_zones(division, len(rows), max_group)
@@ -332,9 +340,15 @@ def _make_card(division: str, rows: list[dict], max_group: int,
         sets   = int(row["sets_won"])
         games  = int(row["games_won"])
         played = int(row["played"])
+        gih    = max_played - played
         pct    = round(sets / max_sets * 100)
+        # Ghost bar: potential sets if they win all games in hand (capped at remaining space)
+        gih_pct  = min(round(gih * 3 / max_sets * 100), 100 - pct) if gih > 0 else 0
+        ghost_bar = (f'<div class="t-bar-gih" style="width:{gih_pct}%"></div>'
+                     if gih_pct > 0 else "")
         tip    = f"Played: {played} &middot; Sets: {sets} &middot; Games: {games}"
         stat   = f'{sets}<small>&middot;{games}g</small>' if played else '<span style="color:#334155">—</span>'
+        gih_badge = ""
         tag_html, zone_cls = _ZONE_TAG[zones[i]]
         separator = " zone-break" if i > 0 and zones[i] != zones[i - 1] else ""
 
@@ -345,8 +359,9 @@ def _make_card(division: str, rows: list[dict], max_group: int,
             f'<span class="t-rank">{_rank(i)}</span>'
             f"<button class=\"t-btn\" onclick='showTeam({json.dumps(team)})'>{team}</button>"
             f'<div class="t-bar-outer"><div class="t-bar"'
-            f' style="width:{pct}%;background:{colors[i]}"></div></div>'
+            f' style="width:{pct}%;background:{colors[i]}"></div>{ghost_bar}</div>'
             f'<span class="t-num">{stat}</span>'
+            f'{gih_badge}'
             f'{tag_html}'
             f'</div>'
         )

@@ -12,14 +12,14 @@ Key differences from the current-season pipeline:
 
 import csv
 import pathlib
+import traceback
 import requests
-import xlrd
-import openpyxl
 from datetime import datetime
 
 from parse import PROJECT_ROOT
 from parse import expand as _expand_current
-from parse.results import COLUMNS_NEEDED, RENAME
+from parse.results import COLUMNS_NEEDED, RENAME, _parse_result_rows
+from parse.schedule import _parse_schedule_rows
 from parse.combine import RESULT_FIELDS
 from parse.leagues import leagues as _leagues
 
@@ -100,69 +100,24 @@ def _download(url, dest):
     return True
 
 
-def _parse_results(xls_path):
-    wb = xlrd.open_workbook(str(xls_path))
-    ws = wb.sheet_by_index(0)
-    headers = ws.row_values(0)
-    col_index = {name: headers.index(name) for name in COLUMNS_NEEDED}
+def _schedule_from_results(results_rows):
+    """Synthesise a schedule from results when no Matrix file is available.
 
-    rows = []
-    for row_idx in range(1, ws.nrows):
-        raw = ws.row_values(row_idx)
-        if raw[col_index["HomeAway"]] != "Home":
-            continue
-        record = {RENAME.get(col, col): raw[col_index[col]]
-                  for col in COLUMNS_NEEDED if col != "HomeAway"}
-        # Historic results store full names but may use alias spellings — normalise.
-        record["home_team"]    = _normalize(record["home_team"])
-        record["away_team"]    = _normalize(record["away_team"])
-        record["fixture_date"] = xlrd.xldate_as_datetime(record["fixture_date"], wb.datemode).date()
-        record["division"]     = record["division"].lstrip("0") or "0"
-        record["home_sets"]    = int(record["home_sets"])
-        record["away_sets"]    = int(record["away_sets"])
-        record["home_games"]   = int(record["home_games"])
-        record["away_games"]   = int(record["away_games"])
-        rows.append(record)
-    return rows
-
-
-def _parse_schedule(xlsx_path):
-    wb = openpyxl.load_workbook(xlsx_path)
-    ws = wb.active
-    assert ws is not None
-    rows = list(ws.iter_rows(values_only=True))
-
-    divisions = []
-    for col_idx in range(1, len(rows[1]), 2):
-        div_name = rows[1][col_idx]
-        if div_name is not None:
-            divisions.append((str(div_name), col_idx))
-
+    Each result row already has date/division/teams so we can use it directly
+    as the schedule fixture.  The combined CSV will have a result for every row.
+    """
+    seen = set()
     fixtures = []
-    data_rows = rows[3:]
-    for group_start in range(0, len(data_rows), 4):
-        group = data_rows[group_start:group_start + 4]
-        fixture_date = group[0][0]
-        if fixture_date is None:
-            continue
-        if isinstance(fixture_date, datetime):
-            fixture_date = fixture_date.date()
-        for div_name, col_idx in divisions:
-            for row in group:
-                home_raw = row[col_idx]     if col_idx     < len(row) else None
-                away_raw = row[col_idx + 1] if col_idx + 1 < len(row) else None
-                if home_raw is None or away_raw is None:
-                    continue
-                home = _expand(str(home_raw))
-                away = _expand(str(away_raw))
-                if home is None or away is None:
-                    continue
-                fixtures.append({
-                    "fixture_date": fixture_date,
-                    "division":     div_name,
-                    "home_team":    home,
-                    "away_team":    away,
-                })
+    for r in results_rows:
+        key = (str(r["fixture_date"]), r["division"], r["home_team"], r["away_team"])
+        if key not in seen:
+            seen.add(key)
+            fixtures.append({
+                "fixture_date": r["fixture_date"],
+                "division":     r["division"],
+                "home_team":    r["home_team"],
+                "away_team":    r["away_team"],
+            })
     return fixtures
 
 
@@ -192,27 +147,6 @@ def _combine_and_write(schedule_rows, results_rows, out_path):
     print(f"  {len(combined)} fixtures, {matched} with results -> {out_path.relative_to(PROJECT_ROOT)}")
 
 
-def _schedule_from_results(results_rows):
-    """Synthesise a schedule from results when no Matrix file is available.
-
-    Each result row already has date/division/teams so we can use it directly
-    as the schedule fixture.  The combined CSV will have a result for every row.
-    """
-    seen = set()
-    fixtures = []
-    for r in results_rows:
-        key = (str(r["fixture_date"]), r["division"], r["home_team"], r["away_team"])
-        if key not in seen:
-            seen.add(key)
-            fixtures.append({
-                "fixture_date": r["fixture_date"],
-                "division":     r["division"],
-                "home_team":    r["home_team"],
-                "away_team":    r["away_team"],
-            })
-    return fixtures
-
-
 if __name__ == "__main__":
     for year in YEARS:
         print(f"\n=== {year} ===")
@@ -227,13 +161,13 @@ if __name__ == "__main__":
                 print("  skipping year (results not available)")
                 continue
 
-            results_rows = _parse_results(results_path)
+            results_rows = _parse_result_rows(results_path, team_fn=_normalize)
 
             schedule_available = _download(
                 f"https://www.datchworth.net/images/{year}Matrix.xlsx", schedule_path
             )
             if schedule_available:
-                schedule_rows = _parse_schedule(schedule_path)
+                schedule_rows = _parse_schedule_rows(schedule_path, expand_fn=_expand)
             else:
                 print("  no Matrix file — synthesising schedule from results")
                 schedule_rows = _schedule_from_results(results_rows)
@@ -244,8 +178,7 @@ if __name__ == "__main__":
             _combine_and_write(schedule_rows, results_rows, out_path)
             _leagues(out_path, out_path.parent / "leagues.csv")
 
-        except Exception as e:
-            import traceback
+        except Exception:
             traceback.print_exc()
 
     print("\nDone.")

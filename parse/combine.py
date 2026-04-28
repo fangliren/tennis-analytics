@@ -1,4 +1,3 @@
-
 import csv
 import pathlib
 from parse import PROJECT_ROOT
