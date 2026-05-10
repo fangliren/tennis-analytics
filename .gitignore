@@ -7,3 +7,6 @@ venv/
 dist/
 build/
 .vscode/
+
+# timestamped snapshots — only the canonical *.csv is tracked
+tables/*/*_20*.csv

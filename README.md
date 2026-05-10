@@ -22,7 +22,7 @@ pip install -e ".[dev]"
 python scripts/update.py
 ```
 
-This downloads the latest results and regenerates the combined table. Pass `--refresh-schedule` to also re-download the fixture list (needed once per season). The repo also includes a GitHub Actions workflow (`.github/workflows/update.yml`) that runs this automatically every Thursday at 05:00 UTC.
+This downloads the latest results and regenerates the combined table. Pass `--refresh-schedule` to also re-download the fixture list (needed once per season). The repo also includes a GitHub Actions workflow (`.github/workflows/update.yml`) that runs this automatically every Tuesday at 02:00 UTC.
 
 ## Test
 

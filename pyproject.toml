@@ -7,7 +7,7 @@ name = "tennis-analytics"
 version = "0.1.0"
 description = "Tennis analytics tools and scripts."
 authors = [
-    { name = "Finnian Firth", email = "finnianfirth@gmail.com" }
+    { name = "Finnian Firth" }
 ]
 dependencies = [
     "requests",
